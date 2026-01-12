@@ -1,3 +1,5 @@
 frontend/
 infraestructure/
-
+.github/
+.README.md
+.gitignore
