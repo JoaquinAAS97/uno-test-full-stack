@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GameSession } from './entities/game-session.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { GameResult } from './enums/game-results.enum';
 
 @Injectable()
 export class GameSessionService {

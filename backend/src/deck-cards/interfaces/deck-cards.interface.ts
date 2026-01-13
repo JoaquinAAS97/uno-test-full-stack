@@ -1,5 +1,3 @@
-
-
 export interface deckCards {
     id: string;
     code_Deck: string;
