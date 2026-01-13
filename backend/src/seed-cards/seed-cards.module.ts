@@ -6,10 +6,7 @@ import { Cards } from './entities/cards.entity';
 import { CommonModule } from 'src/common/common.module';
 
 @Module({
-  imports: [
-    CommonModule,
-    TypeOrmModule.forFeature([Cards])
-  ],
+  imports: [CommonModule, TypeOrmModule.forFeature([Cards])],
   controllers: [SeedCardsController],
   providers: [SeedCardsService],
 })
