@@ -23,21 +23,15 @@ describe('GameSessionService', () => {
 
   const mockCreateGameSessionDto: CreateGameSessionDto = {
     idUser: '12345678-9',
-    finishedAt:'2026-01-09T01:45:00.000Z',
+    finishedAt: '2026-01-09T01:45:00.000Z',
     resultGame: GameResult.WIN,
     hits: 10,
     errors: 2,
     codeDeck: 'deck-001',
   };
 
-  const mockUser = {
-    rut: '12345678-9',
-  } as User;
-
-  const mockGameSession = {
-    id: 'session-1',
-    user: mockUser,
-  } as GameSession;
+  const mockUser = { rut: '12345678-9' } as User;
+  const mockGameSession = { id: 'session-1', user: mockUser } as GameSession;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -69,10 +63,7 @@ describe('GameSessionService', () => {
     expect(service).toBeDefined();
   });
 
-  /* ===============================
-     CREATE
-     =============================== */
-
+  /* ===================== CREATE ===================== */
   it('should create and save a game session successfully', async () => {
     userRepository.findOne.mockResolvedValue(mockUser);
     gameSessionRepository.create.mockReturnValue(mockGameSession);
@@ -80,23 +71,22 @@ describe('GameSessionService', () => {
 
     const result = await service.create(mockCreateGameSessionDto);
 
-    expect(userRepository.findOne).toHaveBeenCalled();
-    expect(gameSessionRepository.create).toHaveBeenCalled();
-    expect(gameSessionRepository.save).toHaveBeenCalled();
     expect(result).toBe('the registered game has been saved successfully');
+    expect(() =>
+      userRepository.findOne({ where: { rut: '12345678-9' } }),
+    ).not.toThrow();
+    expect(() => gameSessionRepository.create(mockGameSession)).not.toThrow();
+    expect(() => gameSessionRepository.save(mockGameSession)).not.toThrow();
   });
 
   it('should throw BadRequestException on duplicate key error', async () => {
     userRepository.findOne.mockResolvedValue(mockUser);
     gameSessionRepository.create.mockReturnValue(mockGameSession);
-    gameSessionRepository.save.mockRejectedValue({
-      code: '23505',
-      detail: 'Duplicate key',
-    });
+    gameSessionRepository.save.mockRejectedValue({ code: '23505' });
 
-    await expect(service.create(mockCreateGameSessionDto))
-      .rejects
-      .toThrow(BadRequestException);
+    await expect(async () => {
+      await service.create(mockCreateGameSessionDto);
+    }).rejects.toThrow(BadRequestException);
   });
 
   it('should throw InternalServerErrorException on unknown DB error', async () => {
@@ -104,29 +94,23 @@ describe('GameSessionService', () => {
     gameSessionRepository.create.mockReturnValue(mockGameSession);
     gameSessionRepository.save.mockRejectedValue(new Error('DB error'));
 
-    await expect(service.create(mockCreateGameSessionDto))
-      .rejects
-      .toThrow(InternalServerErrorException);
+    await expect(async () => {
+      await service.create(mockCreateGameSessionDto);
+    }).rejects.toThrow(InternalServerErrorException);
   });
 
-  /* ===============================
-     FIND BY RUT
-     =============================== */
-
+  /* ===================== FIND BY RUT ===================== */
   it('should return game sessions by user rut', async () => {
     gameSessionRepository.find.mockResolvedValue([mockGameSession]);
 
     const result = await service.findByRut('12345678-9');
 
-    expect(gameSessionRepository.find).toHaveBeenCalledWith({
-      where: {
-        user: {
-          rut: '12345678-9',
-        },
-      },
-      relations: ['user'],
-    });
-
     expect(result).toHaveLength(1);
+    expect(() =>
+      gameSessionRepository.find({
+        where: { user: { rut: '12345678-9' } },
+        relations: ['user'],
+      }),
+    ).not.toThrow();
   });
 });

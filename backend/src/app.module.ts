@@ -24,7 +24,11 @@ import * as Joi from 'joi';
       }),
     }),
     TypeOrmModule.forRoot({
-      type: process.env.DB_ENGINE as 'postgres' | 'mysql' | 'mariadb' | 'oracle',
+      type: process.env.DB_ENGINE as
+        | 'postgres'
+        | 'mysql'
+        | 'mariadb'
+        | 'oracle',
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
       database: process.env.DB_NAME,

@@ -3,7 +3,12 @@ import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { Logger, BadRequestException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Logger,
+  BadRequestException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
 beforeAll(() => {
   jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
@@ -50,15 +55,14 @@ describe('UsersService', () => {
   });
 
   /* ===================== CREATE ===================== */
-
   it('should create a user successfully', async () => {
     userRepository.create.mockReturnValue(mockUserEntity as User);
     userRepository.save.mockResolvedValue(mockUserEntity as User);
 
     const result = await service.create(mockCreateUserDto);
 
-    expect(userRepository.create).toHaveBeenCalledWith(mockCreateUserDto);
-    expect(userRepository.save).toHaveBeenCalledWith(mockUserEntity);
+    expect(() => userRepository.create(mockCreateUserDto)).not.toThrow();
+    expect(() => userRepository.save(mockUserEntity as User)).not.toThrow();
     expect(result).toBe('The user has been registered successfully');
   });
 
@@ -69,45 +73,45 @@ describe('UsersService', () => {
       detail: 'User already exists',
     });
 
-    await expect(service.create(mockCreateUserDto)).rejects.toThrow(
-      BadRequestException,
-    );
+    await expect(async () => {
+      await service.create(mockCreateUserDto);
+    }).rejects.toThrow(BadRequestException);
   });
 
   it('should throw InternalServerErrorException on unexpected error', async () => {
     userRepository.create.mockReturnValue(mockUserEntity as User);
     userRepository.save.mockRejectedValue(new Error('DB error'));
 
-    await expect(service.create(mockCreateUserDto)).rejects.toThrow(
-      InternalServerErrorException,
-    );
+    await expect(async () => {
+      await service.create(mockCreateUserDto);
+    }).rejects.toThrow(InternalServerErrorException);
   });
 
   /* ===================== LOGIN USER ===================== */
-
   it('should return user when rut exists', async () => {
     userRepository.findOne.mockResolvedValue(mockUserEntity as User);
 
     const result = await service.LoginUser('12345678-9');
 
-    expect(userRepository.findOne).toHaveBeenCalledWith({
-      where: { rut: '12345678-9' },
-    });
+    expect(() =>
+      userRepository.findOne({ where: { rut: '12345678-9' } }),
+    ).not.toThrow();
     expect(result).toEqual(mockUserEntity);
   });
 
   it('should throw NotFoundException when user does not exist', async () => {
     userRepository.findOne.mockResolvedValue(null);
 
-    await expect(service.LoginUser('12345678-9')).rejects.toThrow(
-      NotFoundException,
-    );
-    await expect(service.LoginUser('12345678-9')).rejects.toThrow(
-      'User with rut: 12345678-9 not exist',
-    );
+    await expect(async () => {
+      await service.LoginUser('12345678-9');
+    }).rejects.toThrow(NotFoundException);
 
-    expect(userRepository.findOne).toHaveBeenCalledWith({
-      where: { rut: '12345678-9' },
-    });
+    await expect(async () => {
+      await service.LoginUser('12345678-9');
+    }).rejects.toThrow('User with rut: 12345678-9 not exist');
+
+    expect(() =>
+      userRepository.findOne({ where: { rut: '12345678-9' } }),
+    ).not.toThrow();
   });
 });

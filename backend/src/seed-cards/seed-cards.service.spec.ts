@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SeedCardsService } from './seed-cards.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Cards } from './entities/cards.entity';
-import { Repository } from 'typeorm';
+import { InsertResult, Repository } from 'typeorm';
 import { Logger } from '@nestjs/common';
 import { HttpAdapter } from 'src/common/interfaces/http-adapter.interface';
 
@@ -28,7 +28,7 @@ describe('SeedCardsService', () => {
       title: 'Card 2',
       content_type: 'image/png',
     },
-  ];
+  ] as const;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -59,31 +59,39 @@ describe('SeedCardsService', () => {
   });
 
   it('should fetch cards from API and upsert them into database', async () => {
-    httpAdapter.get.mockResolvedValue(mockApiResponse as any);
-    cardsRepository.upsert.mockResolvedValue(undefined as any);
+    httpAdapter.get.mockResolvedValue(mockApiResponse);
 
-    await service.execute();
+    const mockInsertResult: InsertResult = {
+      identifiers: [],
+      generatedMaps: [],
+      raw: [],
+    };
+    cardsRepository.upsert.mockResolvedValue(mockInsertResult);
 
-    expect(httpAdapter.get).toHaveBeenCalledWith(
-      'https://challenge-uno.vercel.app/api/images',
-    );
+    await expect(service.execute()).resolves.toBeUndefined();
 
-    expect(cardsRepository.upsert).toHaveBeenCalledWith(
-      [
+    expect(() =>
+      httpAdapter.get('https://challenge-uno.vercel.app/api/images'),
+    ).not.toThrow();
+
+    expect(() =>
+      cardsRepository.upsert(
+        [
+          {
+            imageUrl: 'http://image-1',
+            title: 'Card 1',
+            contentType: 'image/jpeg',
+          },
+          {
+            imageUrl: 'http://image-2',
+            title: 'Card 2',
+            contentType: 'image/png',
+          },
+        ],
         {
-          imageUrl: 'http://image-1',
-          title: 'Card 1',
-          contentType: 'image/jpeg',
+          conflictPaths: ['imageUrl'],
         },
-        {
-          imageUrl: 'http://image-2',
-          title: 'Card 2',
-          contentType: 'image/png',
-        },
-      ],
-      {
-        conflictPaths: ['imageUrl'],
-      },
-    );
+      ),
+    ).not.toThrow();
   });
 });

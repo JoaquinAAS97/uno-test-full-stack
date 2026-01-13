@@ -3,19 +3,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Cards } from 'src/seed-cards/entities/cards.entity';
 import { Repository } from 'typeorm';
 import { deckCards } from './interfaces/deck-cards.interface';
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class DeckCardsService {
- 
   constructor(
     @InjectRepository(Cards)
     private readonly cardsRepository: Repository<Cards>,
-  ) { }
+  ) {}
 
   async generateDeck(): Promise<deckCards[]> {
-    const  deckCode = uuidv4();
-    
+    const deckCode = uuidv4();
+
     const cards = await this.cardsRepository.find();
 
     function makeNewDeck(card: Cards): deckCards {
@@ -30,8 +29,11 @@ export class DeckCardsService {
       };
     }
 
-     // Duplicate pairs 
-    let deck: deckCards[] = cards.flatMap(card => [makeNewDeck(card), makeNewDeck(card)]);
+    // Duplicate pairs
+    const deck: deckCards[] = cards.flatMap((card) => [
+      makeNewDeck(card),
+      makeNewDeck(card),
+    ]);
 
     // Fisher–Yates algorithm to shuffle cards
     for (let i = deck.length - 1; i > 0; i--) {
@@ -47,4 +49,3 @@ export class DeckCardsService {
     return deck;
   }
 }
-
