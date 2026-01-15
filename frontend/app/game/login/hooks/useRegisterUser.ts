@@ -14,12 +14,15 @@ export function useRegister() {
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
+ 
+      if (res.status !== 200 && res.status !== 201) {
         return Promise.reject(data);
       }
 
       return data;
+    } catch (err) {
+      
+      return Promise.reject(err);
     } finally {
       setLoading(false);
     }
