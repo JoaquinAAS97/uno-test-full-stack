@@ -1,27 +1,6 @@
-# Dependencias locales
 node_modules
-npm-debug.log
-yarn-error.log
-pnpm-lock.yaml
-
-# Builds y artefactos
 dist
-build
-
-# Archivos de configuración locales
 .env
-.env.local
-.env.development
-.env.production
-.env.test
-
-# Archivos de sistema
+npm-debug.log
 .DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# Tests y coverage
-coverage
-__tests__/
+.git
