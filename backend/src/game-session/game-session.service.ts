@@ -39,7 +39,7 @@ export class GameSessionService {
       });
 
       await this.gameSessionRepository.save(gameSession);
-      return 'the registered game has been saved successfully';
+      return { message: 'The user has been registered successfully'};
     } catch (error) {
       this.handleDbExceptions(error);
     }

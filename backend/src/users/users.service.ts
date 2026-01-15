@@ -23,7 +23,7 @@ export class UsersService {
     try {
       const user = this.userRepository.create(createUserDto);
       await this.userRepository.save(user);
-      return 'The user has been registered successfully';
+      return { message: 'The user has been registered successfully', user };
     } catch (error) {
       this.handleDbExceptions(error);
     }

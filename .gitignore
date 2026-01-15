@@ -3,6 +3,7 @@
 Thumbs.db
 .vscode/
 .idea/
+postgres/
 
 # Env (global)
 .env

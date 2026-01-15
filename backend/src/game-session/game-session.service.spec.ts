@@ -1,68 +1,116 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { GameSessionService } from './game-session.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { GameSession } from './entities/game-session.entity';
+import { User } from '../users/entities/user.entity';
+import { Repository } from 'typeorm';
 import {
   BadRequestException,
-  Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
 import { CreateGameSessionDto } from './dto/create-game-session.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { GameSession } from './entities/game-session.entity';
-import { Repository } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
+import { GameResult } from './enums/game-results.enum';
 
-@Injectable()
-export class GameSessionService {
-  private readonly logger = new Logger('GameSessionService');
+describe('GameSessionService', () => {
+  let service: GameSessionService;
+  let gameSessionRepository: jest.Mocked<Repository<GameSession>>;
+  let userRepository: jest.Mocked<Repository<User>>;
 
-  constructor(
-    @InjectRepository(GameSession)
-    private readonly gameSessionRepository: Repository<GameSession>,
+  beforeAll(() => {
+    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
+  });
 
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-  ) {}
+  const mockCreateGameSessionDto: CreateGameSessionDto = {
+    idUser: '12345678-9',
+    finishedAt: '2026-01-09T01:45:00.000Z',
+    resultGame: GameResult.WIN,
+    hits: 10,
+    errors: 2,
+    codeDeck: 'deck-001',
+  };
 
-  async create(createGameSessionDto: CreateGameSessionDto) {
-    try {
-      const user = await this.userRepository.findOne({
-        where: { id: createGameSessionDto.idUser },
-      });
+  const mockUser = { rut: '12345678-9' } as User;
+  const mockGameSession = { id: 'session-1', user: mockUser } as GameSession;
 
-      if (!user) throw new NotFoundException('User not found');
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        GameSessionService,
+        {
+          provide: getRepositoryToken(GameSession),
+          useValue: {
+            create: jest.fn(),
+            save: jest.fn(),
+            find: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(User),
+          useValue: {
+            findOne: jest.fn(),
+          },
+        },
+      ],
+    }).compile();
 
-      const { ...rest } = createGameSessionDto;
+    service = module.get<GameSessionService>(GameSessionService);
+    gameSessionRepository = module.get(getRepositoryToken(GameSession));
+    userRepository = module.get(getRepositoryToken(User));
+  });
 
-      const gameSession = this.gameSessionRepository.create({
-        ...rest,
-        user,
-      });
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
 
-      await this.gameSessionRepository.save(gameSession);
-      return { message: 'The user has been registered successfully'};
-    } catch (error) {
-      this.handleDbExceptions(error);
-    }
-  }
+  /* ===================== CREATE ===================== */
+  it('should create and save a game session successfully', async () => {
+    userRepository.findOne.mockResolvedValue(mockUser);
+    gameSessionRepository.create.mockReturnValue(mockGameSession);
+    gameSessionRepository.save.mockResolvedValue(mockGameSession);
 
-  async findByRut(rut: string): Promise<GameSession[]> {
-    return this.gameSessionRepository.find({
-      where: {
-        user: { rut },
-      },
-      relations: ['user'],
-    });
-  }
+    const result = await service.create(mockCreateGameSessionDto);
 
-  private handleDbExceptions(error: unknown) {
-    const err = error as { code?: string; detail?: string };
+    expect(result).toBe('the registered game has been saved successfully');
+    expect(() =>
+      userRepository.findOne({ where: { rut: '12345678-9' } }),
+    ).not.toThrow();
+    expect(() => gameSessionRepository.create(mockGameSession)).not.toThrow();
+    expect(() => gameSessionRepository.save(mockGameSession)).not.toThrow();
+  });
 
-    if (err.code === '23505') {
-      throw new BadRequestException(err.detail);
-    }
-    this.logger.error(error);
-    throw new InternalServerErrorException(
-      `Unexpected error: ${(error as Error).toString()}, check server logs`,
-    );
-  }
-}
+  it('should throw BadRequestException on duplicate key error', async () => {
+    userRepository.findOne.mockResolvedValue(mockUser);
+    gameSessionRepository.create.mockReturnValue(mockGameSession);
+    gameSessionRepository.save.mockRejectedValue({ code: '23505' });
+
+    await expect(async () => {
+      await service.create(mockCreateGameSessionDto);
+    }).rejects.toThrow(BadRequestException);
+  });
+
+  it('should throw InternalServerErrorException on unknown DB error', async () => {
+    userRepository.findOne.mockResolvedValue(mockUser);
+    gameSessionRepository.create.mockReturnValue(mockGameSession);
+    gameSessionRepository.save.mockRejectedValue(new Error('DB error'));
+
+    await expect(async () => {
+      await service.create(mockCreateGameSessionDto);
+    }).rejects.toThrow(InternalServerErrorException);
+  });
+
+  /* ===================== FIND BY RUT ===================== */
+  it('should return game sessions by user rut', async () => {
+    gameSessionRepository.find.mockResolvedValue([mockGameSession]);
+
+    const result = await service.findByRut('12345678-9');
+
+    expect(result).toHaveLength(1);
+    expect(() =>
+      gameSessionRepository.find({
+        where: { user: { rut: '12345678-9' } },
+        relations: ['user'],
+      }),
+    ).not.toThrow();
+  });
+});
