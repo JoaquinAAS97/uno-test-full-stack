@@ -7,17 +7,17 @@
 git clone https://github.com/JoaquinAAS97/uno-test-full-stack.git 
 
 ```
-2. Acceder a la ruta de la carpeta backend ```cd backend/``` y leer el READM.md y seguir todos los pasos:
+2. Acceder a la ruta de la carpeta backend ```cd backend/```  leer el READM.md y seguir todos los pasos que se le indica:
 
-3. Acceder a la ruta de la carpeta backend ```cd frontend/``` y leer el READM.md y seguir todos los pasos:
+3. Acceder a la ruta de la carpeta backend ```cd frontend/``` leer el READM.md y seguir todos los pasos que se le indica:
 
-4. Una vez que todos los pasos están realizados, puede acceder a la ruta ```cd infra-docke/```
+4. Una vez que todos los pasos anteriores hayan sido realizados, usted debe acceder a la ruta ```cd infra-docke/```
 
 5. Ingresar al Directorio infra-docker que se encuentra en la raiz del proyecto  ```cd infra-docker/```.
    
-7. Ingresar los datos de conexion en el archivo ```.env-template``` y renombrarlo a ```.env```
+7. Ingresar los datos de conexión en el archivo ```.env-template``` y renombrar el archivo a ```.env```
 
-8. Consturir el docker-compose, ejecutar el siguiente comando:
+8. Consturir el docker-compose, para esto usted debe ejecutar el siguiente comando dentro de la carpeta ```cd infra-docker/```:
 
 ```
 docker compose up --build
@@ -40,11 +40,11 @@ docker compose up --build
 
 
 # SOBRE EL DISEÑO DE LA BASE DE DATOS:
-## Se diseño con 3 entidades:
+## Se diseñaron 3 entidades:
   - Users
-  - Game_session: sesiones de juego, recopilacion de estadisticas de cada partida
+  - Game_session: sesiones de juego, recopilacion de estadisticas de cada partida.
   - CARDS --> entidad que permite guardar las cartas (Se usa para ejecutar el SEDD de las imagenes dispuestas en esta ruta: GET https://challenge-uno.vercel.app/api/images)
-  - DECK --> entidad sólo conceptual, es decir, el mazo se genera de forma virtual, no se guarda en base de datos, esto para seguir las practicas de juegos similares, la entida se genera por cada sesion de juego y deja como rasto su código, el cual es usado para el registro de la entidad Game_session para saber con qué mazo se jugó y cuando fue generado por el juego.
+  - DECK --> entidad sólo conceptual, es decir, el mazo se genera de forma virtual, no se guarda en base de datos, esto para seguir las practicas de juegos similares, la entida se genera por cada sesion de juego y deja como rastro su código de mazo, el cual es usado para el registro de la entidad Game_session, con la finalidad de saber con qué mazo se jugó y cuando este fue  generado por el juego.
 
 ## DISEÑO:
 
@@ -60,5 +60,5 @@ docker compose up --build
    - el juego genera un mazo aleatorio utilizando la entidad de cards
    - Para que el juego genere el mazo aleatorio, además, usa el algoritmo Fisher-yates
    - entrega el mazo y lo sirve para el juego respetando el ciclo de vida del mismo
-   - cuando termina el juego, muestra un mensaje final al usuario (usuario x ganó, perdió o si se rindió)
-   - Finalment el juego envia las estadisticas del juego al servidor.
+   - cuando termina el juego, muestra un mensaje final al usuario (usuario "x" ganó, perdió o se rindió)
+   - Finalmente, el juego envia las estadisticas de la partida al servidor.
