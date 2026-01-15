@@ -4,13 +4,19 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/:path*", 
-        destination: "http://localhost:3001/api/:path*", 
+        source: "/api/:path*",
+        destination: "http://backend:3001/api/:path*",
       },
     ];
   },
   images: {
-    domains: ["challenge-uno.vercel.app"], // allow external url imas 
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "challenge-uno.vercel.app",
+        pathname: "/images/**",
+      },
+    ],
   },
 };
 
