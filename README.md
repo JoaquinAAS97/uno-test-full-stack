@@ -13,10 +13,14 @@ git clone https://github.com/JoaquinAAS97/uno-test-full-stack.git
 
 4. Una vez que todos los pasos están realizados, puede acceder a la ruta ```cd infra-docke/```
 
-5. Consturir el docker-compose, ejecutar el siguiente comando:
+5. Ingresar al Directorio infra-docker que se encuentra en la raiz del proyecto  ```cd infra-docker/```.
+   
+7. Ingresar los datos de conexion en el archivo ```.env-template``` y renombrarlo a ```.env```
+
+8. Consturir el docker-compose, ejecutar el siguiente comando:
 
 ```
-docker compose --env-file ../backend/.env up -d --build
+docker compose up --build
 ```
 
 ### SOBRE STACK TECNOLOGICO
