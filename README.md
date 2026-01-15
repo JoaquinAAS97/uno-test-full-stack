@@ -44,7 +44,7 @@ docker compose --env-file ../backend/.env up -d --build
 
 ## DISEÑO:
 
- [ ![alt text](image.png)](https://drawsql.app/teams/kot-app/diagrams/desafio-uno/embed)
+  diseño-bd.png
 
 
 ## Sobre funcionalidades:
