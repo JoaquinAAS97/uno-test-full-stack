@@ -4,6 +4,7 @@ import {
   IsInt,
   IsPositive,
   IsUUID,
+  Min,
 } from 'class-validator';
 import { GameResult } from '../enums/game-results.enum';
 import { Transform } from 'class-transformer';
@@ -20,11 +21,11 @@ export class CreateGameSessionDto {
   resultGame: GameResult;
 
   @IsInt()
-  @IsPositive()
+  @Min(0)
   hits: number;
 
   @IsInt()
-  @IsPositive()
+  @Min(0)
   errors: number;
 
   @IsUUID()
