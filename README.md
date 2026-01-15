@@ -44,7 +44,8 @@ docker compose --env-file ../backend/.env up -d --build
 
 ## DISEÑO:
 
-  diseño-bd.png
+![Diseño de base de datos](./diseño-bd.png)
+
 
 
 ## Sobre funcionalidades:
