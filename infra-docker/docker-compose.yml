@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:14.3
+    container_name: desafio-uno-fullstack
+    restart: always
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    env_file:
+      - ../backend/.env
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../infra-docker/Backend/Dockerfile
+    container_name: backend-desafio
+    ports:
+      - "3001:3001"
+    working_dir: /app
+    volumes:
+      - ../backend:/app
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../infra-docker/frontend/Dockerfile
+    container_name: frontend-desafio
+    ports:
+      - "3000:3000"
+    working_dir: /app
+    volumes:
+      - ../frontend:/app
+    depends_on:
+      - backend
+
