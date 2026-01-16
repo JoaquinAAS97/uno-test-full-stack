@@ -8,6 +8,7 @@ git clone https://github.com/JoaquinAAS97/uno-test-full-stack.git
 
 ```
 2. Acceder a la ruta de la carpeta backend ```cd backend/```  leer el READM.md y seguir todos los pasos que se le indica:
+__NOTA IMPORTANTE: ```EJECUTAR LA RUTA SEED del backend para que las cartas sean registradas previamente```__
 
 3. Acceder a la ruta de la carpeta backend ```cd frontend/``` leer el READM.md y seguir todos los pasos que se le indica:
 
