@@ -57,9 +57,9 @@ docker compose up --build
   ### __El juego realiza:__
    - inicio sesion de usuario
    - registro de usuario
-   - aceso a menu e historial de resultaso de juegos pasados
+   - acceso al menu e historial de resultados de juegos pasados
    - el juego genera un mazo aleatorio utilizando la entidad de cards
-   - Para que el juego genere el mazo aleatorio, además, usa el algoritmo Fisher-yates
-   - entrega el mazo y lo sirve para el juego respetando el ciclo de vida del mismo
-   - cuando termina el juego, muestra un mensaje final al usuario (usuario "x" ganó, perdió o se rindió)
+   - Para que el juego genere el mazo aleatorio, se implementó el algoritmo __FISHER-YATES__
+   - El backend envía el mazo de cartas "barajado" y el frontend lo sirve para la partida(sesion de juego)
+   - cuando termina el juego, el sistema muestra un mensaje final al usuario (usuario "x" ganó, perdió o se rindió)
    - Finalmente, el juego envia las estadisticas de la partida al servidor.
