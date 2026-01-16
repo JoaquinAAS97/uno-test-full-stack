@@ -49,7 +49,7 @@ docker compose up --build
 
 ## DISEÑO:
 
-![Diseño de base de datos](./diseño-bd.png)
+![Diseño de base de datos]()
 
 
 
